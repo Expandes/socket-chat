@@ -31,6 +31,7 @@ io.on('connection', (client) => {
 
         //Broadcast sólo a personas de la sala
         client.broadcast.to(dataDelCliente.sala).emit('listaPersona', usuarios.getPersonasPorSala(dataDelCliente.sala));
+        client.broadcast.to(dataDelCliente.sala).emit('CrearMensaje', crearMensaje('Administrador', `${dataDelCliente.nombre} se unió`));
 
 
         respAlClienteCallback(usuarios.getPersonasPorSala(dataDelCliente.sala));
@@ -39,12 +40,15 @@ io.on('connection', (client) => {
 
     //Escucha el EMIT del cliente para crear mensajes, y lo devuelve como broadcast para todos
     //No olvidar que el SERVER es el nodo del chat
-    client.on('crearMensaje', (data) => {
+    client.on('crearMensaje', (data, callback) => {
 
         let persona = usuarios.getPersona(client.id);
 
         let mensaje = crearMensaje(persona.nombre, data.mensaje);
         client.broadcast.to(persona.sala).emit('crearMensaje', mensaje);
+
+
+        callback(mensaje);
     });
 
 
@@ -53,12 +57,15 @@ io.on('connection', (client) => {
 
         let personaBorrada = usuarios.borrarPersona(client.id);
 
-        client.broadcast.to(personaBorrada.sala).emit('CrearMensaje', crearMensaje('Administrador', `${personaBorrada.nombre} salió`));
+        client.broadcast.to(personaBorrada.sala).emit('crearMensaje', crearMensaje('Administrador', `${personaBorrada.nombre} salió`));
         //client.broadcast.emit('CrearMensaje', { usuario: 'Administrador', mensae: `${personaBorrada.nombre} abandonó el chat` });
 
         client.broadcast.to(personaBorrada.sala).emit('listaPersona', usuarios.getPersonasPorSala(personaBorrada.sala));
 
     });
+
+
+
 
     //Mensajes privados NODO
 
