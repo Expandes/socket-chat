@@ -3,6 +3,7 @@ const { Usuarios } = require('../classes/clsUsuarios');
 const { crearMensaje } = require('../utilidades/utilidades');
 
 
+//Clase nuevos usuarios
 const usuarios = new Usuarios();
 
 
